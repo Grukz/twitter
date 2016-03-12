@@ -1,3 +1,5 @@
+#ignore temporary files
+*~
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -104,4 +106,5 @@ tmtagsHistory
 .bundle
 
 test.py
-
+keys.py
+*.json
