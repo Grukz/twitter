@@ -108,3 +108,6 @@ tmtagsHistory
 test.py
 keys.py
 *.json
+bin/
+include/
+local
