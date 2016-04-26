@@ -111,3 +111,8 @@ keys.py
 bin/
 include/
 local
+*.txt
+*.png
+*.ipynb
+Charts/
+.env
