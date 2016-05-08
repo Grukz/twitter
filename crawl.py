@@ -8,6 +8,7 @@ import requests
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
+import datetime
 reload(sys)
 sys.setdefaultencoding('utf-8')
 from requests.packages.urllib3.exceptions import InsecurePlatformWarning
@@ -58,7 +59,7 @@ def get_my_friends_ids(api):
     with open('my_friends_ids.json', 'w') as fp:
         for friend in tweepy.Cursor(api.friends_ids).items():
             # Process a single status
-            json.dump(friend , fp, indent = 4)
+            json.dump(friend, fp, indent = 4)
             fp.write("\n")
 
 
@@ -75,7 +76,7 @@ def get_my_friends_tweets(file_read,file_write,api):
                 for page in tweepy.Cursor(api.user_timeline,user_id=id,
                                           count=200).pages(16):
                     for status in page:
-                        json.dump(status._json, fp1 , indent = 4)
+                        json.dump(status._json, fp1, indent=4)
 
 
 def get_tweets_from_friends(file_read, file_write , api, from_id, to_id):
@@ -98,8 +99,59 @@ def get_tweets_from_friends(file_read, file_write , api, from_id, to_id):
                         fp1.write(",\n")
 
 
-
     #del tweets[:]
+
+def get_number_of_followers(file_write , api):
+    """
+
+    :param file_write:
+    :param api:
+    :return:
+    """
+    follow = {}
+    """with open(file_read, 'r') as fr:
+        for user_id in fr:
+            for user in tweepy.Cursor(api.followers, id=id).items():
+                print user.screen_name, user.followers_count"""
+    for user in tweepy.Cursor(api.friends).items():
+        counter = 0
+        for followers in tweepy.Cursor(api.followers,
+                                       user_id=user.id).items():
+            counter += followers.followers_count
+            print user.name, user.followers_count, counter
+
+        print user.name, user.followers_count, counter
+
+
+def create_graph_edges(file_write, api):
+    """
+    Create a file that contains the edges of a directed graph
+    in the format "user_id user2_id"
+    :param file_write:
+    :param api:
+    :return:
+    """
+    with open(file_write, 'a') as fp1:
+        for user in tweepy.Cursor(api.friends).items():
+            followers = api.followers_ids(user_id=user.id)
+            for id in followers:
+                fp1.write(str(id)+" "+str(user.id)+"\n")
+            friends = api.friends_ids(user_id=user.id)
+            for id in friends:
+                fp1.write(str(user.id)+" "+str(id)+"\n")
+            with open('log.txt', 'a') as fp2:
+                fp2.write("    User '" +str(user.name)+"' connections have "
+                                                      "been extracted")
+                fp2.write("\n")
+
+
+
+def map_usernames(file_write, api):
+    with open(file_write, 'a') as fp:
+        for user in tweepy.Cursor(api.friends).items():
+            fp.write(str(user.id)+","+str(user.name)+","+str(user.screen_name))
+            fp.write("\n")
+
 
 def get_tweets_from_friends_new(file_read,file_write,api):
     """
@@ -233,8 +285,16 @@ def plot_figure(label, filename, list_of_tuples):
 
 
 if __name__ == '__main__':
-    #api = init_twitter("./keys.json")
+    api = init_twitter("./keys.json")
     #get_my_friends_ids(api)
+    with open('log.txt', 'a') as fp:
+    	fp.write("Started at " +str(datetime.datetime.now()))
+	fp.write("\n")
+    #create_graph_edges('twitter_edges.txt', api)
+    #map_usernames("twitter_users.txt", api)
+    with open('log.txt', 'a') as fp:
+    	fp.write("Finished at " +str(datetime.datetime.now()))
+	fp.write("\n")
     """year_ids = [12688864940, 22407857857101824, 166595393906413569,
                 288970763451645952, 428511662610468864, 552963257116655617, 714176974076248064]
     old_id = year_ids[0]
@@ -255,17 +315,17 @@ if __name__ == '__main__':
     #for key, value in counts:
     #   print 'number of tweets with ', key, 'words: ', value
     #json_file = load_json('tweets[test].json')
-    json_file = load_json('friends_tweets.json')
+    #json_file = load_json('friends_tweets.json')
     #hashtags = hashtags_freq(json_file)
     #mentions = mentions_freq(json_file)
     #urls =  urls_freq(json_file)
-    words =  words_freq(json_file)
+    #words =  words_freq(json_file)
     #print repr(words).decode("unicode-escape")
     #all_tweets = load_json('friends_tweets.json')
     #plot_figure('Word Frequencies','test-figure.png',words)
     #plot_figure('Hashtag Frequencies','hashtags.png',mentions)
-    for key, value in words[:50]:
+    """for key, value in words[:50]:
        print key
     print "here we change"
     for key, value in words[:50]:
-       print value
+       print value"""
