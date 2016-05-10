@@ -103,7 +103,7 @@ def get_tweets_from_friends(file_read, file_write , api, from_id, to_id):
 
 def get_number_of_followers(file_write , api):
     """
-
+    Get number of followers for each user that follow me
     :param file_write:
     :param api:
     :return:
@@ -127,8 +127,8 @@ def create_graph_edges(file_write, api):
     """
     Create a file that contains the edges of a directed graph
     in the format "user_id user2_id"
-    :param file_write:
-    :param api:
+    :param file_write: the output file in which the vertices will be saved
+    :param api: the twitter API object return by tweepy
     :return:
     """
     with open(file_write, 'a') as fp1:
@@ -147,6 +147,12 @@ def create_graph_edges(file_write, api):
 
 
 def map_usernames(file_write, api):
+    """
+    Extract user mapping into a csv file with "id,name,username" on each line
+    :param file_write: the file in which the csv will be saved
+    :param api: the twitter API object return by tweepy
+    :return:
+    """
     with open(file_write, 'a') as fp:
         for user in tweepy.Cursor(api.friends).items():
             fp.write(str(user.id)+","+str(user.name)+","+str(user.screen_name))
